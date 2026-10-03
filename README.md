@@ -11,9 +11,19 @@ Plandalf's public API and receives signed purchase events to grant membership ac
 
 *Captured from the running plugin on a local WordPress test site, 4 October 2026.*
 
-## OAuth connection status
+## OAuth connection status (0.2.0 development)
 
-Version 0.1.0 uses a legacy code-to-API-key connection and has a manual API-key/address fallback. The supported integration must use OAuth to bind the authorized account and host/domain. That replacement is not implemented in this release. Do not use the legacy flow as the production setup path.
+The 0.2.0 development build uses OAuth authorization code with S256 PKCE. The account selected during consent supplies its checkout host, domain and SDK URL. Manual API-key and host entry have been removed.
+
+Access and refresh tokens are encrypted in WordPress using the site's authentication salt and excluded from autoload. Expired tokens refresh at the original issuer. Disconnect revokes the connection and its tokens. Customer identity is signed by Plandalf through the OAuth API; WordPress does not hold its signing key.
+
+The published 0.1.0 ZIP still uses the legacy API-key flow. The OAuth backend and 0.2.0 ZIP are not yet released. A compatible development backend is required, and the browser replay must finish against the account that owns the membership prices before launch.
+
+![OAuth-only MemberPress connection screen](docs/images/oauth-connection.png)
+
+*Real local WordPress screen, 4 October 2026.*
+
+[OAuth setup and backend contract](docs/oauth.md)
 
 ## What the plugin does
 

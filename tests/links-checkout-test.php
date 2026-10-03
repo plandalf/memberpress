@@ -113,8 +113,9 @@ T::add('links: creating a price from a membership upserts the price and links it
     T::same([777], Plandalf_Mepr_Links::linked_price_ids($membership->ID), 'cache updated');
 });
 
-T::add('identity: the member token is an HS256 JWT with sub wp:<id> and the key id', function () {
+T::add('identity: obtains the member token through OAuth without a local signing key', function () {
     T::connect();
+    T::route('/api/v1/site-connection/identity', fn ($args, $body) => [200, ['token' => Plandalf_Mepr_Jwt::encode($body, 'server-only-secret', 'site-key-abc')]]);
     $user_id = self_user('jwt@example.com');
     $token = Plandalf_Mepr_Jwt::for_user(get_userdata($user_id));
     [$header, $payload, $signature] = explode('.', $token);
@@ -123,7 +124,7 @@ T::add('identity: the member token is an HS256 JWT with sub wp:<id> and the key 
     T::same('site-key-abc', $decode($header)['kid']);
     T::same('wp:'.$user_id, $decode($payload)['sub']);
     T::same('jwt@example.com', $decode($payload)['email']);
-    T::same(rtrim(strtr(base64_encode(hash_hmac('sha256', "{$header}.{$payload}", 'test_testkey', true)), '+/', '-_'), '='), $signature);
+    T::same(rtrim(strtr(base64_encode(hash_hmac('sha256', "{$header}.{$payload}", 'server-only-secret', true)), '+/', '-_'), '='), $signature);
 });
 
 T::add('lists: MemberPress\'s Subscriptions list shows which rows Plandalf bills', function () {

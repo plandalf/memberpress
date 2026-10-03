@@ -4,13 +4,15 @@ Tags: memberpress, checkout, memberships, order bumps, subscriptions
 Requires at least: 6.4
 Tested up to: 7.1
 Requires PHP: 8.2
-Stable tag: 0.1.0
+Stable tag: 0.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
 Sell MemberPress memberships through Plandalf checkout. MemberPress keeps members and access; Plandalf takes the payment.
 
 == Description ==
+
+Development version 0.2.0 uses OAuth with PKCE. The authorized account supplies the host and SDK URL. It requires the matching OAuth backend; this build is not a hosted production release.
 
 Early-access source release. The default hosted Plandalf connection endpoint is not yet available. Evaluate with a compatible development server; do not replace a live membership checkout until hosted setup and buyer access have been verified.
 
@@ -69,5 +71,5 @@ Its settings, event log and schedule, and this site's event endpoint in Plandalf
 
 == Changelog ==
 
-= 0.1.0 =
+= 0.2.0 =
 * Early access release: connect, checkout design, price links with drift, embedded, popup and full-screen checkout, signed purchase events, guest accounts with first-password setup, renewals, cancellations, refunds and a daily check.
