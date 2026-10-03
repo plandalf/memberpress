@@ -2,7 +2,7 @@
 
 /**
  * Plugin Name:       Plandalf for MemberPress
- * Plugin URI:        https://plandalf.com/docs/product-guides/platforms/memberpress
+ * Plugin URI:        https://github.com/plandalf/memberpress#installation
  * Description:       Sell MemberPress memberships through Plandalf checkout. Plandalf takes the payment; the plugin grants the membership.
  * Version:           0.2.0
  * Requires at least: 6.4

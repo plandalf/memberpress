@@ -24,7 +24,7 @@ Plandalf for MemberPress puts your Plandalf checkout where the MemberPress signu
 * **New buyers pay first** and choose their password afterwards. Logged-in members are recognised automatically.
 * **Every payment is recorded in MemberPress** as a normal transaction, numbered with its Plandalf invoice.
 
-Setup guide: https://plandalf.com/docs/product-guides/platforms/memberpress
+Development installation: https://github.com/plandalf/memberpress#installation
 
 = Needs =
 
