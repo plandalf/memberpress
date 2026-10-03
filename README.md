@@ -11,6 +11,10 @@ Plandalf's public API and receives signed purchase events to grant membership ac
 
 *Captured from the running plugin on a local WordPress test site, 4 October 2026.*
 
+## OAuth connection status
+
+Version 0.1.0 uses a legacy code-to-API-key connection and has a manual API-key/address fallback. The supported integration must use OAuth to bind the authorized account and host/domain. That replacement is not implemented in this release. Do not use the legacy flow as the production setup path.
+
 ## What the plugin does
 
 - Replaces linked MemberPress signup forms with your Plandalf checkout design.
