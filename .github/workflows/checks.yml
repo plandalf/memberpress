@@ -1,0 +1,44 @@
+name: Plugin checks
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: ['8.2', '8.4']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: PHP syntax
+        run: find . -name '*.php' -not -path './dist/*' -print0 | xargs -0 -n 1 php -l
+      - name: JavaScript tests
+        run: npm test
+      - name: Build plugin ZIP
+        run: npm run build
+      - name: Verify archive and checksums
+        working-directory: dist
+        run: |
+          unzip -t plandalf-memberpress.zip
+          sha256sum --check SHA256SUMS
+      - name: Save installation package
+        if: matrix.php == '8.2'
+        uses: actions/upload-artifact@v4
+        with:
+          name: plandalf-memberpress
+          path: |
+            dist/*.zip
+            dist/SHA256SUMS
