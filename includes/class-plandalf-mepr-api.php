@@ -4,19 +4,34 @@ defined('ABSPATH') || exit;
 
 /**
  * Thin client for Plandalf's public REST API (/api/v1). Every call is
- * authenticated with the site's API key. Errors come back as WP_Error with
+ * authenticated with the site's OAuth access token. Errors come back as WP_Error with
  * the HTTP status and Plandalf's message so admin screens can show them.
  */
 class Plandalf_Mepr_Api
 {
     public function __construct(
-        private string $api_key,
+        private string $access_token,
         private string $api_base,
     ) {}
 
     public static function from_settings(): self
     {
-        return new self((string) Plandalf_Mepr_Settings::get('api_key'), Plandalf_Mepr_Settings::api_base());
+        return new self('', Plandalf_Mepr_Settings::api_base());
+    }
+
+    public function connection(): array|WP_Error
+    {
+        return $this->request('GET', 'site-connection');
+    }
+
+    public function revoke(): array|WP_Error
+    {
+        return $this->request('DELETE', 'site-connection');
+    }
+
+    public function identity(array $claims): array|WP_Error
+    {
+        return $this->request('POST', 'site-connection/identity', $claims);
     }
 
     /** @return array<string, mixed>|WP_Error */
@@ -153,8 +168,9 @@ class Plandalf_Mepr_Api
      */
     private function request(string $method, string $path, ?array $body = null): array|WP_Error
     {
-        if ($this->api_key === '') {
-            return new WP_Error('plandalf_not_connected', __('Add your Plandalf API key first.', 'plandalf-memberpress'));
+        $token = $this->access_token !== '' ? $this->access_token : Plandalf_Mepr_Connection::access_token();
+        if (is_wp_error($token)) {
+            return $token;
         }
 
         $args = [
@@ -162,7 +178,7 @@ class Plandalf_Mepr_Api
             'timeout' => 15,
             'redirection' => 0,
             'headers' => [
-                'Authorization' => 'Bearer '.$this->api_key,
+                'Authorization' => 'Bearer '.$token,
                 'Accept' => 'application/json',
                 'User-Agent' => 'plandalf-memberpress/'.PLANDALF_MEPR_VERSION.'; '.home_url(),
             ],

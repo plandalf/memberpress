@@ -193,8 +193,14 @@ class Plandalf_Mepr_Checkout
         $sdk_url = (string) ($settings['organization']['sdk_url'] ?? '');
         $user = wp_get_current_user();
 
+        $identity = $user->exists() ? Plandalf_Mepr_Jwt::for_user($user) : null;
+        if ($user->exists() && ! $identity && self::$needs_assets) {
+            echo '<p role="alert">'.esc_html__('We could not verify your account for checkout. Please reload or contact the site owner.', 'plandalf-memberpress').'</p>';
+            return;
+        }
+
         $config = [
-            'identity' => $user->exists() ? Plandalf_Mepr_Jwt::for_user($user) : null,
+            'identity' => $identity,
             'memberships' => (object) self::$offers,
             'statusUrl' => rest_url('plandalf/v1/purchase-status'),
             'waitingFor' => $waiting ? sanitize_text_field(wp_unslash($_GET['plandalf_invoice'])) : null,

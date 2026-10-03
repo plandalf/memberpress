@@ -7,7 +7,7 @@ use Plandalf_Test as T;
 require_once dirname(__DIR__).'/includes/class-plandalf-mepr-uninstall.php';
 
 T::add('uninstall: unregisters the event endpoint and forgets the site, keeping MemberPress records', function () {
-    T::route('/api/v1/webhook_endpoints', fn () => [200, ['deleted' => true]]);
+    T::route('/api/v1/site-connection', fn () => [200, ['deleted' => true]]);
     T::connect();
     $gateway_id = (string) get_option(Plandalf_Mepr_Plugin::GATEWAY_OPTION);
     $membership = T::membership('Gold', 29.00);
@@ -20,7 +20,7 @@ T::add('uninstall: unregisters the event endpoint and forgets the site, keeping 
 
     Plandalf_Mepr_Uninstall::forget_site();
 
-    $deleted = current(array_filter(T::$requests, fn ($r) => str_contains($r['url'], 'webhook_endpoints/7') && $r['method'] === 'DELETE'));
+    $deleted = current(array_filter(T::$requests, fn ($r) => str_contains($r['url'], 'site-connection') && $r['method'] === 'DELETE'));
     T::true($deleted !== false, 'endpoint unregistered');
     foreach (Plandalf_Mepr_Uninstall::OPTIONS as $option) {
         T::false(get_option($option), $option);

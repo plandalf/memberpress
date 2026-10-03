@@ -169,6 +169,7 @@ T::add('events: the lock covers hooks and event persistence and is released afte
 });
 
 T::add('events: daily reconciliation shares the lock and schedules a deferred retry', function () {
+    wp_clear_scheduled_hook(Plandalf_Mepr_Reconcile::HOOK);
     T::connect();
     $membership = T::membership('Gold', 29);
     $invoice = T::invoice($membership);
