@@ -12,6 +12,8 @@ Sell MemberPress memberships through Plandalf checkout. MemberPress keeps member
 
 == Description ==
 
+Early-access source release. The default hosted Plandalf connection endpoint is not yet available. Evaluate with a compatible development server; do not replace a live membership checkout until hosted setup and buyer access have been verified.
+
 Plandalf for MemberPress puts your Plandalf checkout where the MemberPress signup form used to be. Buyers pay on Plandalf, with your order bumps, discount codes and checkout design. The moment Plandalf confirms the payment, the plugin gives them the membership in MemberPress.
 
 * **MemberPress keeps** members, memberships, access rules, protected content, groups, emails and the account page.

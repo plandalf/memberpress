@@ -16,7 +16,7 @@ import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 
 const SLUG = 'plandalf-memberpress';
-const RUNTIME = ['plandalf-memberpress.php', 'uninstall.php', 'readme.txt', 'includes', 'gateways', 'assets'];
+const RUNTIME = ['plandalf-memberpress.php', 'uninstall.php', 'readme.txt', 'LICENSE', 'includes', 'gateways', 'assets'];
 
 const here = dirname(fileURLToPath(import.meta.url));
 const dist = join(here, 'dist');

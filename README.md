@@ -1,7 +1,26 @@
-# Plandalf for MemberPress
+# Plandalf for MemberPress: WordPress checkout plugin
 
 Sell MemberPress memberships through Plandalf checkout. The plugin connects to
 Plandalf's public API and receives signed purchase events to grant membership access.
+
+[Download v0.1.0](https://github.com/plandalf/memberpress/releases/tag/v0.1.0) · [Setup guide](https://plandalf.com/docs/product-guides/platforms/memberpress) · [MemberPress integration](https://plandalf.com/platforms/memberpress)
+
+**Early access:** the plugin source and ZIP are available. The default hosted Plandalf connection endpoint is not yet deployed, so a standard hosted setup cannot currently connect. Use a compatible development server for evaluation; wait for hosted availability before replacing a live checkout.
+
+![MemberPress settings linking Gold Monthly and Lifetime Pass memberships to Plandalf prices](docs/images/membership-price-mapping.png)
+
+*Captured from the running plugin on a local WordPress test site, 4 October 2026.*
+
+## What the plugin does
+
+- Replaces linked MemberPress signup forms with your Plandalf checkout design.
+- Maps multiple billing prices, such as monthly and yearly, to one membership.
+- Applies signed purchase events and records the corresponding MemberPress transactions.
+- Handles subscription renewal, cancellation and refund events, with duplicate-delivery protection.
+- Provides new buyers with a password-setup handoff after membership fulfilment.
+
+MemberPress continues to manage protected content, membership rules and member accounts. Payments use the processor connected to Plandalf.
+
 
 ## Requirements
 
@@ -54,7 +73,7 @@ JavaScript tests and packaging; it does not install the commercial MemberPress p
 
 ## Release status
 
-Version 0.1.0 is being prepared for early access. Before publishing a supported
+Version 0.1.0 is an early-access source release. Before publishing a supported
 release, verify the target Plandalf deployment includes site connection, catalog
 links, subscription and webhook APIs. Complete a clean installation, test purchase,
 password setup, email delivery and protected-content access against that deployment.
@@ -62,6 +81,16 @@ password setup, email delivery and protected-content access against that deploym
 Campaign mappings currently report `checkout_enabled: false`; timer-driven membership
 pricing is not ready. The plugin skips post-payment upsell pages. Existing MemberPress
 subscriptions continue through their original payment gateway.
+
+## Questions
+
+**Does it migrate existing subscribers?** No. Existing MemberPress subscriptions keep their original gateway.
+
+**Does the plugin include MemberPress?** No. Install and license MemberPress separately. This is a Plandalf plugin, not an official MemberPress product.
+
+**Are checkout upsells and deadline-based membership prices supported?** Post-payment upsell pages are skipped, and campaign-based membership price changes remain unavailable.
+
+**Where should I report problems?** Open a [GitHub issue](https://github.com/plandalf/memberpress/issues) with versions, reproduction steps and sanitized errors. Never post API keys, webhook secrets or customer data.
 
 ## Releasing
 
