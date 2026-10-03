@@ -3,7 +3,7 @@
 Sell MemberPress memberships through Plandalf checkout. The plugin connects to
 Plandalf's public API and receives signed purchase events to grant membership access.
 
-[Download v0.1.0](https://github.com/plandalf/memberpress/releases/tag/v0.1.0) · [Development installation](#installation)
+[Download v0.1.0](https://github.com/plandalf/memberpress/releases/tag/v0.1.0) · [Setup guide](https://plandalf.com/docs/product-guides/platforms/memberpress) · [Integration overview](https://plandalf.com/platforms/memberpress)
 
 **Early access:** the plugin source and ZIP are available. The default hosted Plandalf connection endpoint is not yet deployed, so a standard hosted setup cannot currently connect. Use a compatible development server for evaluation; wait for hosted availability before replacing a live checkout.
 
@@ -42,7 +42,7 @@ include development files; use the packaged asset for installation.
 Activate the plugin, open **MemberPress → Plandalf**, connect your account, choose a
 checkout design, and create or link the prices that grant each membership.
 
-The hosted MemberPress guide and integration page are not published yet. Use the development instructions in this README.
+Read the [MemberPress setup guide](https://plandalf.com/docs/product-guides/platforms/memberpress) for requirements, real screenshots, price mapping and buyer verification. The [integration overview](https://plandalf.com/platforms/memberpress) and [launch post](https://plandalf.com/blog/2026-10-04-plandalf-memberpress-wordpress-checkout-plugin) explain the early-access scope and hosted setup status.
 
 ## Development
 
