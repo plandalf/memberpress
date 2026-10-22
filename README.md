@@ -3,21 +3,21 @@
 Sell MemberPress memberships through Plandalf checkout. The plugin connects to
 Plandalf's public API and receives signed purchase events to grant membership access.
 
-[Download v0.1.0](https://github.com/plandalf/memberpress/releases/tag/v0.1.0) · [Setup guide](https://plandalf.com/docs/product-guides/platforms/memberpress) · [Integration overview](https://plandalf.com/platforms/memberpress)
+[Download v0.2.0](https://github.com/plandalf/memberpress/releases/tag/v0.2.0) · [Setup guide](https://plandalf.com/docs/product-guides/platforms/memberpress) · [Integration overview](https://plandalf.com/platforms/memberpress)
 
-**Early access:** the plugin source and ZIP are available. The default hosted Plandalf connection endpoint is not yet deployed, so a standard hosted setup cannot currently connect. Use a compatible development server for evaluation; wait for hosted availability before replacing a live checkout.
+**Early access:** set it up on a staging site first, and replace a live checkout only after your own test purchase and member access check pass.
 
 ![MemberPress settings linking Gold Monthly and Lifetime Pass memberships to Plandalf prices](docs/images/membership-price-mapping.png)
 
 *Captured from the running plugin on a local WordPress test site, 4 October 2026.*
 
-## OAuth connection status (0.2.0 development)
+## OAuth connection
 
-The 0.2.0 development build uses OAuth authorization code with S256 PKCE. The account selected during consent supplies its checkout host, domain and SDK URL. Manual API-key and host entry have been removed.
+Version 0.2.0 uses OAuth authorization code with S256 PKCE. The account selected during consent supplies its checkout host, domain and SDK URL. Manual API-key and host entry have been removed.
 
 Access and refresh tokens are encrypted in WordPress using the site's authentication salt and excluded from autoload. Expired tokens refresh at the original issuer. Disconnect revokes the connection and its tokens. Customer identity is signed by Plandalf through the OAuth API; WordPress does not hold its signing key.
 
-The published 0.1.0 ZIP still uses the legacy API-key flow. The OAuth backend and 0.2.0 ZIP are not yet released. A compatible development backend is required, and the browser replay must finish against the account that owns the membership prices before launch.
+Version 0.1.0 used the legacy API-key flow; 0.1.0 sites must reconnect after updating.
 
 ![OAuth-only MemberPress connection screen](docs/images/oauth-connection.png)
 
@@ -87,10 +87,10 @@ JavaScript tests and packaging; it does not install the commercial MemberPress p
 
 ## Release status
 
-Version 0.1.0 is an early-access source release. Before publishing a supported
-release, verify the target Plandalf deployment includes site connection, catalog
-links, subscription and webhook APIs. Complete a clean installation, test purchase,
-password setup, email delivery and protected-content access against that deployment.
+Version 0.2.0 is an early-access release. The hosted Plandalf deployment includes site
+connection, catalog links, subscription and webhook APIs. Before replacing a live
+checkout, complete a test purchase, password setup, email delivery and protected-content
+access check on your own staging site.
 
 Campaign mappings currently report `checkout_enabled: false`; timer-driven membership
 pricing is not ready. The plugin skips post-payment upsell pages. Existing MemberPress

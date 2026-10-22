@@ -1,6 +1,6 @@
 # MemberPress OAuth connection
 
-The 0.2.0 development build requires the matching Plandalf OAuth backend. It is not yet a hosted production release.
+Version 0.2.0 connects to Plandalf's hosted OAuth backend at `https://admin.plandalf.dev`.
 
 ## Merchant flow
 
