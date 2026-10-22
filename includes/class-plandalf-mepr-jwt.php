@@ -3,9 +3,8 @@
 defined('ABSPATH') || exit;
 
 /**
- * Signs the identity token passed to `plandalf.identify()` for logged-in
- * members. HS256 with the site's API key; the `kid` header is the key id
- * Plandalf reported from GET /api/v1/organization.
+ * Requests a short-lived checkout identity through OAuth. Signing keys stay
+ * on Plandalf; access tokens are never used as JWT signing secrets.
  */
 class Plandalf_Mepr_Jwt
 {
@@ -27,10 +26,7 @@ class Plandalf_Mepr_Jwt
     /** Token for a WordPress user, or null when the site is not connected. */
     public static function for_user(WP_User $user): ?string
     {
-        $settings = Plandalf_Mepr_Settings::all();
-        $kid = $settings['organization']['api_key_id'] ?? '';
-
-        if ($settings['api_key'] === '' || $kid === '') {
+        if (! Plandalf_Mepr_Settings::is_connected()) {
             return null;
         }
 
@@ -51,7 +47,9 @@ class Plandalf_Mepr_Jwt
          */
         $claims = (array) apply_filters('plandalf_mepr_identity_claims', $claims, $user);
 
-        return self::encode($claims, (string) $settings['api_key'], (string) $kid);
+        $result = Plandalf_Mepr_Api::from_settings()->identity($claims);
+
+        return is_wp_error($result) ? null : ($result['token'] ?? null);
     }
 
     private static function base64url(string $data): string

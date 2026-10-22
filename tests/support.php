@@ -148,7 +148,13 @@ final class Plandalf_Test
     public static function connect(string $mode = 'test'): void
     {
         Plandalf_Mepr_Settings::update([
-            'api_key' => $mode.'_testkey',
+            'api_key' => '',
+            'oauth' => [
+                'access_token' => Plandalf_Mepr_Settings::seal('oauth-access-test'),
+                'refresh_token' => Plandalf_Mepr_Settings::seal('oauth-refresh-test'),
+                'expires_at' => time() + 3600, 'client_id' => '11111111-1111-4111-8111-111111111111',
+                'issuer' => 'https://plandalf.example',
+            ],
             'api_base' => 'https://plandalf.example',
             'organization' => ['id' => 1, 'name' => 'Acme', 'api_key_id' => 'site-key-abc', 'mode' => $mode, 'sdk_url' => 'https://acme.plandalf.example/js/plandalf-sdk.js'],
             'endpoint' => ['id' => 7, 'secret' => self::SECRET, 'url' => Plandalf_Mepr_Settings::events_url()],

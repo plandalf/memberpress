@@ -4,7 +4,7 @@
  * Plugin Name:       Plandalf for MemberPress
  * Plugin URI:        https://plandalf.com/platforms/memberpress
  * Description:       Sell MemberPress memberships through Plandalf checkout. Plandalf takes the payment; the plugin grants the membership.
- * Version:           0.1.0
+ * Version:           0.2.0
  * Requires at least: 6.4
  * Requires PHP:      8.2
  * Author:            Plandalf
@@ -13,7 +13,7 @@
  */
 defined('ABSPATH') || exit;
 
-define('PLANDALF_MEPR_VERSION', '0.1.0');
+define('PLANDALF_MEPR_VERSION', '0.2.0');
 define('PLANDALF_MEPR_FILE', __FILE__);
 define('PLANDALF_MEPR_PATH', plugin_dir_path(__FILE__));
 define('PLANDALF_MEPR_URL', plugin_dir_url(__FILE__));
@@ -26,7 +26,6 @@ require_once PLANDALF_MEPR_PATH.'includes/class-plandalf-mepr-password-setup.php
 require_once PLANDALF_MEPR_PATH.'includes/class-plandalf-mepr-fulfillment.php';
 require_once PLANDALF_MEPR_PATH.'includes/class-plandalf-mepr-events.php';
 require_once PLANDALF_MEPR_PATH.'includes/class-plandalf-mepr-links.php';
-require_once PLANDALF_MEPR_PATH.'includes/class-plandalf-mepr-campaign.php';
 require_once PLANDALF_MEPR_PATH.'includes/class-plandalf-mepr-connection.php';
 require_once PLANDALF_MEPR_PATH.'includes/class-plandalf-mepr-admin.php';
 require_once PLANDALF_MEPR_PATH.'includes/class-plandalf-mepr-membership-tab.php';

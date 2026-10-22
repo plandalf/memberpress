@@ -23,7 +23,6 @@ class Plandalf_Mepr_Admin
         add_action('admin_menu', [self::class, 'menu'], 99);
         add_action('admin_post_plandalf_mepr_start_connect', [self::class, 'handle_start_connect']);
         add_action('admin_post_plandalf_mepr_connected', [self::class, 'handle_connected']);
-        add_action('admin_post_plandalf_mepr_connect', [self::class, 'handle_connect_with_key']);
         add_action('admin_post_plandalf_mepr_disconnect', [self::class, 'handle_disconnect']);
         add_action('admin_post_plandalf_mepr_checkout', [self::class, 'handle_checkout']);
         add_action('admin_post_plandalf_mepr_create_price', [self::class, 'handle_create_price']);
@@ -56,9 +55,10 @@ class Plandalf_Mepr_Admin
     {
         self::guard('plandalf_mepr_start_connect');
 
-        $api_base = self::submitted_api_base();
+        $api_base = Plandalf_Mepr_Settings::issuer();
+        $verifier = rtrim(strtr(base64_encode(random_bytes(48)), '+/', '-_'), '=');
         $state = wp_generate_password(40, false);
-        set_transient(self::STATE.get_current_user_id(), ['state' => $state, 'api_base' => $api_base], 15 * MINUTE_IN_SECONDS);
+        set_transient(self::STATE.get_current_user_id(), ['state' => $state, 'api_base' => $api_base, 'verifier' => Plandalf_Mepr_Settings::seal($verifier)], 15 * MINUTE_IN_SECONDS);
 
         // wp_redirect, not wp_safe_redirect: Plandalf is deliberately off-site.
         wp_redirect($api_base.'/connect/site?'.http_build_query([
@@ -66,6 +66,8 @@ class Plandalf_Mepr_Admin
             'return' => self::connected_url(),
             'state' => $state,
             'platform' => 'memberpress',
+            'code_challenge' => rtrim(strtr(base64_encode(hash('sha256', $verifier, true)), '+/', '-_'), '='),
+            'code_challenge_method' => 'S256',
         ]));
         exit;
     }
@@ -78,12 +80,13 @@ class Plandalf_Mepr_Admin
         }
 
         $pending = get_transient(self::STATE.get_current_user_id());
-        delete_transient(self::STATE.get_current_user_id());
 
         $state = sanitize_text_field(wp_unslash($_GET['state'] ?? ''));
         if (! is_array($pending) || ! hash_equals((string) $pending['state'], $state)) {
             self::back(['error' => __('That connection attempt expired. Click Connect with Plandalf again.', 'plandalf-memberpress')]);
         }
+
+        delete_transient(self::STATE.get_current_user_id());
 
         if (isset($_GET['error'])) {
             self::back(['error' => __('Connection cancelled.', 'plandalf-memberpress')]);
@@ -92,13 +95,15 @@ class Plandalf_Mepr_Admin
         $grant = Plandalf_Mepr_Connection::exchange_code(
             (string) $pending['api_base'],
             sanitize_text_field(wp_unslash($_GET['code'] ?? '')),
-            self::connected_url()
+            self::connected_url(),
+            sanitize_text_field(wp_unslash($_GET['client_id'] ?? '')),
+            Plandalf_Mepr_Settings::unseal((string) $pending['verifier'])
         );
         if (is_wp_error($grant)) {
             self::back(['error' => $grant->get_error_message()]);
         }
 
-        $result = Plandalf_Mepr_Connection::connect($grant['api_key'], $grant['api_base']);
+        $result = Plandalf_Mepr_Connection::connect($grant, (string) $pending['api_base']);
         if (is_wp_error($result)) {
             self::back(['error' => $result->get_error_message()]);
         }
@@ -106,26 +111,13 @@ class Plandalf_Mepr_Admin
         self::back(['notice' => __('Connected to Plandalf. Next, choose your checkout design.', 'plandalf-memberpress')]);
     }
 
-    /** Advanced: connect by pasting an API key instead. */
-    public static function handle_connect_with_key(): void
-    {
-        self::guard('plandalf_mepr_connect');
-
-        $api_key = sanitize_text_field(wp_unslash($_POST['api_key'] ?? ''));
-        if ($api_key === '') {
-            self::back(['error' => __('Paste your Plandalf API key.', 'plandalf-memberpress')]);
-        }
-
-        $result = Plandalf_Mepr_Connection::connect($api_key, self::submitted_api_base());
-        self::back(is_wp_error($result)
-            ? ['error' => $result->get_error_message()]
-            : ['notice' => __('Connected to Plandalf. Next, choose your checkout design.', 'plandalf-memberpress')]);
-    }
-
     public static function handle_disconnect(): void
     {
         self::guard('plandalf_mepr_disconnect');
-        Plandalf_Mepr_Connection::disconnect();
+        $result = Plandalf_Mepr_Connection::disconnect();
+        if (is_wp_error($result)) {
+            self::back(['error' => $result->get_error_message()]);
+        }
         self::back(['notice' => __('Disconnected. Memberships are back on the MemberPress signup form.', 'plandalf-memberpress')]);
     }
 
@@ -228,6 +220,7 @@ class Plandalf_Mepr_Admin
                     <?php esc_html_e('Plandalf sends purchase events to', 'plandalf-memberpress'); ?>
                     <code><?php echo esc_html($settings['endpoint']['url'] ?? ''); ?></code>.
                     <?php esc_html_e('If you use a security or caching plugin, let this address through.', 'plandalf-memberpress'); ?>
+                    <br /><?php esc_html_e('Checkout host:', 'plandalf-memberpress'); ?> <code><?php echo esc_html($settings['organization']['host_url'] ?? ''); ?></code>
                 </p>
                 <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" onsubmit="return confirm('<?php echo esc_js(__('Disconnect from Plandalf? Memberships go back to the MemberPress signup form.', 'plandalf-memberpress')); ?>');" style="display:inline">
                     <?php wp_nonce_field('plandalf_mepr_disconnect'); ?>
@@ -235,40 +228,16 @@ class Plandalf_Mepr_Admin
                     <?php submit_button(__('Disconnect', 'plandalf-memberpress'), 'secondary', 'submit', false); ?>
                 </form>
             <?php } else { ?>
-                <p><?php esc_html_e('You\'ll sign in to Plandalf, pick your account, and come straight back.', 'plandalf-memberpress'); ?></p>
+                <p><?php esc_html_e('Sign in to Plandalf and authorize your account. Its checkout host and domain are configured automatically.', 'plandalf-memberpress'); ?></p>
             <?php } ?>
 
             <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" style="<?php echo $connected ? 'display:inline;margin-left:8px' : ''; ?>">
                 <?php wp_nonce_field('plandalf_mepr_start_connect'); ?>
                 <input type="hidden" name="action" value="plandalf_mepr_start_connect" />
-                <input type="hidden" name="api_base" value="<?php echo esc_attr(Plandalf_Mepr_Settings::api_base()); ?>" />
                 <?php submit_button($connected ? __('Reconnect', 'plandalf-memberpress') : __('Connect with Plandalf', 'plandalf-memberpress'), $connected ? 'secondary' : 'primary hero', 'submit', false); ?>
             </form>
 
-            <details style="margin-top:16px">
-                <summary><?php esc_html_e('Advanced', 'plandalf-memberpress'); ?></summary>
-                <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
-                    <?php wp_nonce_field('plandalf_mepr_connect'); ?>
-                    <input type="hidden" name="action" value="plandalf_mepr_connect" />
-                    <table class="form-table" role="presentation">
-                        <tr>
-                            <th scope="row"><label for="plandalf_api_key"><?php esc_html_e('Connect with an API key', 'plandalf-memberpress'); ?></label></th>
-                            <td>
-                                <input type="password" id="plandalf_api_key" name="api_key" class="regular-text" autocomplete="off" placeholder="live_… or test_…" />
-                                <p class="description"><?php esc_html_e('Only if you can\'t use the button above. Create a key in Plandalf under Settings → API keys.', 'plandalf-memberpress'); ?></p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th scope="row"><label for="plandalf_api_base"><?php esc_html_e('Plandalf address', 'plandalf-memberpress'); ?></label></th>
-                            <td>
-                                <input type="url" id="plandalf_api_base" name="api_base" class="regular-text" value="<?php echo esc_attr(Plandalf_Mepr_Settings::api_base()); ?>" />
-                                <p class="description"><?php esc_html_e('Leave as is unless Plandalf support asks you to change it.', 'plandalf-memberpress'); ?></p>
-                            </td>
-                        </tr>
-                    </table>
-                    <?php submit_button(__('Connect with key', 'plandalf-memberpress'), 'secondary', 'submit', false); ?>
-                </form>
-            </details>
+
         </div>
         <?php
     }
@@ -486,13 +455,6 @@ class Plandalf_Mepr_Admin
     private static function connected_url(): string
     {
         return admin_url('admin-post.php?action=plandalf_mepr_connected');
-    }
-
-    private static function submitted_api_base(): string
-    {
-        $submitted = esc_url_raw(wp_unslash($_POST['api_base'] ?? ''));
-
-        return untrailingslashit($submitted ?: Plandalf_Mepr_Settings::api_base());
     }
 
     private static function mode_badge(string $mode): void

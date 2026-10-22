@@ -2,18 +2,6 @@
 
 defined('ABSPATH') || exit;
 
-/**
- * Typed access to the plugin's single option row.
- *
- * Shape:
- *   api_key      string  the Plandalf API key (live_… or test_…)
- *   api_base     string  Plandalf app URL, e.g. https://admin.plandalf.dev
- *   organization array   { id, name, api_key_id, mode, sdk_url } from GET /api/v1/organization
- *   endpoint     array   { id, secret, url } — this site's registered event endpoint
- *   checkout_offer       string  offer slug used as the checkout design for every membership
- *   checkout_offer_name  string
- *   replace_checkout     bool    replace MemberPress's signup form site-wide (default on)
- */
 class Plandalf_Mepr_Settings
 {
     public const OPTION = 'plandalf_mepr_settings';
@@ -27,6 +15,7 @@ class Plandalf_Mepr_Settings
 
         return wp_parse_args(is_array($stored) ? $stored : [], [
             'api_key' => '',
+            'oauth' => [],
             'api_base' => self::DEFAULT_API_BASE,
             'organization' => [],
             'endpoint' => [],
@@ -58,12 +47,41 @@ class Plandalf_Mepr_Settings
     {
         $all = self::all();
 
-        return $all['api_key'] !== '' && ! empty($all['organization']['id']) && ! empty($all['endpoint']['secret']);
+        return ! empty($all['oauth']['access_token']) && ! empty($all['organization']['id']) && ! empty($all['endpoint']['secret']);
     }
 
     public static function mode(): string
     {
         return (string) (self::all()['organization']['mode'] ?? 'live');
+    }
+
+    public static function issuer(): string
+    {
+        return defined('PLANDALF_MEPR_OAUTH_ISSUER')
+            ? untrailingslashit(PLANDALF_MEPR_OAUTH_ISSUER) : self::DEFAULT_API_BASE;
+    }
+
+    /** Tokens are encrypted at rest using the site's WordPress salt. */
+    public static function seal(string $value): string
+    {
+        $iv = random_bytes(12);
+        $encrypted = openssl_encrypt($value, 'aes-256-gcm', hash('sha256', wp_salt('auth'), true), OPENSSL_RAW_DATA, $iv, $tag);
+        if ($encrypted === false) {
+            throw new RuntimeException('Unable to encrypt the Plandalf credential.');
+        }
+
+        return base64_encode($iv.$tag.$encrypted);
+    }
+
+    public static function unseal(string $value): string
+    {
+        $bytes = base64_decode($value, true);
+        if ($bytes === false || strlen($bytes) < 29) {
+            return '';
+        }
+        $decrypted = openssl_decrypt(substr($bytes, 28), 'aes-256-gcm', hash('sha256', wp_salt('auth'), true), OPENSSL_RAW_DATA, substr($bytes, 0, 12), substr($bytes, 12, 16));
+
+        return $decrypted === false ? '' : $decrypted;
     }
 
     public static function events_url(): string

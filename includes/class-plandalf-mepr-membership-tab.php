@@ -87,7 +87,6 @@ class Plandalf_Mepr_Membership_Tab
 
         <h3 class="mepr-page-heading" style="margin-top:28px"><?php esc_html_e('Checkout on this membership\'s page', 'plandalf-memberpress'); ?></h3>
         <?php self::render_checkout_settings($id, $settings, $linked_ids); ?>
-        <?php self::render_campaign($id, is_wp_error($links) ? [] : $links); ?>
         <?php
     }
 
@@ -275,41 +274,6 @@ class Plandalf_Mepr_Membership_Tab
         <?php
     }
 
-    private static function render_campaign(int $membership_id, array $links): void
-    {
-        $saved = Plandalf_Mepr_Campaign::saved($membership_id);
-        $status = $saved ? Plandalf_Mepr_Campaign::status($membership_id) : null;
-        ?>
-        <h3 class="mepr-page-heading"><?php esc_html_e('Campaign pricing', 'plandalf-memberpress'); ?></h3>
-        <p class="description"><?php esc_html_e('Map a Plandalf campaign to this membership. Every campaign tier must grant the same membership. Saving a mapping does not change this page\'s price.', 'plandalf-memberpress'); ?></p>
-        <p><label for="plandalf_campaign_slug"><?php esc_html_e('Campaign slug', 'plandalf-memberpress'); ?></label><br />
-            <input id="plandalf_campaign_slug" name="plandalf_campaign_slug" type="text" class="regular-text" value="<?php echo esc_attr($saved['promo'] ?? ''); ?>" />
-        </p>
-        <p><label for="plandalf_campaign_link"><?php esc_html_e('Membership grant link', 'plandalf-memberpress'); ?></label><br />
-            <select id="plandalf_campaign_link" name="plandalf_campaign_link">
-                <option value=""><?php esc_html_e('Choose a linked price', 'plandalf-memberpress'); ?></option>
-                <?php foreach ($links as $link) { ?>
-                    <option value="<?php echo (int) $link['id']; ?>" <?php selected($saved['link_id'] ?? 0, $link['id']); ?>><?php echo esc_html(($link['price']['product']['name'] ?? 'Membership').' — '.self::terms($link['price'] ?? [])); ?></option>
-                <?php } ?>
-            </select>
-        </p>
-        <?php if (is_wp_error($status)) { ?>
-            <p style="color:#b32d2e"><?php echo esc_html($status->get_error_message()); ?></p>
-        <?php } elseif ($saved) { ?>
-            <p><?php echo esc_html(($status['checkout_enabled'] ?? false) === true
-                ? (Plandalf_Mepr_Campaign::selected($membership_id) ? __('This page uses campaign pricing.', 'plandalf-memberpress') : __('Campaign checkout is available. You can use it on this page.', 'plandalf-memberpress'))
-                : __('Mapping saved. Campaign checkout is not available yet.', 'plandalf-memberpress')); ?></p>
-        <?php } ?>
-        <p>
-            <button type="submit" class="button" name="plandalf_action" value="campaign-save"><?php esc_html_e('Save campaign mapping', 'plandalf-memberpress'); ?></button>
-            <?php if ($saved) { ?>
-                <button type="submit" class="button" name="plandalf_action" value="campaign-select" <?php disabled(is_wp_error($status) || ($status['checkout_enabled'] ?? false) !== true); ?>><?php esc_html_e('Use campaign on this page', 'plandalf-memberpress'); ?></button>
-                <button type="submit" class="button" name="plandalf_action" value="campaign-forget"><?php esc_html_e('Use fixed price and forget this selection', 'plandalf-memberpress'); ?></button>
-            <?php } ?>
-        </p>
-        <?php
-    }
-
     public static function save(MeprProduct $membership): void
     {
         if (! isset($_POST['_plandalf_nonce']) || ! wp_verify_nonce(sanitize_key(wp_unslash($_POST['_plandalf_nonce'])), self::NONCE)) {
@@ -345,12 +309,6 @@ class Plandalf_Mepr_Membership_Tab
         $link_id = (int) $link_id;
 
         switch ($verb) {
-            case 'campaign-save':
-                return Plandalf_Mepr_Campaign::save((int) $membership->ID, absint($_POST['plandalf_campaign_link'] ?? 0), sanitize_text_field(wp_unslash($_POST['plandalf_campaign_slug'] ?? '')));
-            case 'campaign-select':
-                return Plandalf_Mepr_Campaign::select((int) $membership->ID);
-            case 'campaign-forget':
-                return Plandalf_Mepr_Campaign::forget((int) $membership->ID);
             case 'create':
                 $result = Plandalf_Mepr_Links::create_price_from($membership);
 

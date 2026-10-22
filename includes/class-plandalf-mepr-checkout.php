@@ -38,11 +38,6 @@ class Plandalf_Mepr_Checkout
         }
 
         $membership = $vars['product'] ?? null;
-        if ($membership instanceof MeprProduct && Plandalf_Mepr_Campaign::selected((int) $membership->ID)
-            && ! Plandalf_Mepr_Links::page_settings((int) $membership->ID)['opted_out']
-            && Plandalf_Mepr_Settings::get('replace_checkout', true)) {
-            return self::buy_ui((int) $membership->ID);
-        }
         if (! $membership instanceof MeprProduct || ! Plandalf_Mepr_Links::sells_with_plandalf((int) $membership->ID)) {
             return $view;
         }
@@ -56,7 +51,7 @@ class Plandalf_Mepr_Checkout
         $atts = shortcode_atts(['membership' => '', 'class' => ''], (array) $atts, 'plandalf_buy');
         $membership_id = absint($atts['membership']);
 
-        if (! $membership_id || (! Plandalf_Mepr_Campaign::selected($membership_id) && ! Plandalf_Mepr_Links::sells_with_plandalf($membership_id))) {
+        if (! $membership_id || ! Plandalf_Mepr_Links::sells_with_plandalf($membership_id)) {
             return current_user_can('edit_posts')
                 ? '<p><em>'.esc_html__('[plandalf_buy]: this membership has no linked Plandalf price, or no checkout design is set.', 'plandalf-memberpress').'</em></p>'
                 : '';
@@ -71,9 +66,6 @@ class Plandalf_Mepr_Checkout
     {
         $state = Plandalf_Mepr_Links::page_settings($membership_id);
         $selection = self::selection_attributes($membership_id);
-        if (is_wp_error($selection)) {
-            return self::unavailable();
-        }
         self::track($membership_id);
 
         if ($state['display'] === 'inline') {
@@ -99,9 +91,6 @@ class Plandalf_Mepr_Checkout
     {
         $state = Plandalf_Mepr_Links::page_settings($membership_id);
         $selection ??= self::selection_attributes($membership_id);
-        if (is_wp_error($selection)) {
-            return self::unavailable();
-        }
         self::track($membership_id);
 
         return sprintf(
@@ -116,25 +105,9 @@ class Plandalf_Mepr_Checkout
         );
     }
 
-    private static function selection_attributes(int $membership_id): string|WP_Error
+    private static function selection_attributes(int $membership_id): string
     {
-        if (! Plandalf_Mepr_Campaign::selected($membership_id)) {
-            return ' data-plandalf-price="'.esc_attr((string) Plandalf_Mepr_Links::page_settings($membership_id)['price_key']).'"';
-        }
-        if (! Plandalf_Mepr_Settings::is_connected()) {
-            return new WP_Error('plandalf_disconnected');
-        }
-        $status = Plandalf_Mepr_Campaign::status($membership_id);
-        if (is_wp_error($status) || ($status['checkout_enabled'] ?? false) !== true) {
-            return new WP_Error('plandalf_campaign_unavailable');
-        }
-
-        return ' data-plandalf-catalog-link="'.(int) $status['binding']['link_id'].'" data-plandalf-apply-promo="'.esc_attr($status['promo']).'"';
-    }
-
-    private static function unavailable(): string
-    {
-        return '<p class="plandalf-mepr-unavailable">'.esc_html__('This membership campaign is unavailable. Please contact the site before purchasing.', 'plandalf-memberpress').'</p>';
+        return ' data-plandalf-price="'.esc_attr((string) Plandalf_Mepr_Links::page_settings($membership_id)['price_key']).'"';
     }
 
     /**
@@ -193,8 +166,14 @@ class Plandalf_Mepr_Checkout
         $sdk_url = (string) ($settings['organization']['sdk_url'] ?? '');
         $user = wp_get_current_user();
 
+        $identity = $user->exists() ? Plandalf_Mepr_Jwt::for_user($user) : null;
+        if ($user->exists() && ! $identity && self::$needs_assets) {
+            echo '<p role="alert">'.esc_html__('We could not verify your account for checkout. Please reload or contact the site owner.', 'plandalf-memberpress').'</p>';
+            return;
+        }
+
         $config = [
-            'identity' => $user->exists() ? Plandalf_Mepr_Jwt::for_user($user) : null,
+            'identity' => $identity,
             'memberships' => (object) self::$offers,
             'statusUrl' => rest_url('plandalf/v1/purchase-status'),
             'waitingFor' => $waiting ? sanitize_text_field(wp_unslash($_GET['plandalf_invoice'])) : null,

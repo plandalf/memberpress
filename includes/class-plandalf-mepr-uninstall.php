@@ -28,8 +28,8 @@ class Plandalf_Mepr_Uninstall
         global $wpdb;
 
         $endpoint_id = (int) (Plandalf_Mepr_Settings::get('endpoint')['id'] ?? 0);
-        if ($endpoint_id > 0 && Plandalf_Mepr_Settings::get('api_key') !== '') {
-            Plandalf_Mepr_Api::from_settings()->delete_endpoint($endpoint_id);
+        if ($endpoint_id > 0 && Plandalf_Mepr_Settings::is_connected()) {
+            Plandalf_Mepr_Api::from_settings()->revoke();
         }
 
         wp_clear_scheduled_hook('plandalf_mepr_reconcile');
