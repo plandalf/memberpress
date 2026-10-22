@@ -52,7 +52,7 @@ include development files; use the packaged asset for installation.
 Activate the plugin, open **MemberPress → Plandalf**, connect your account, choose a
 checkout design, and create or link the prices that grant each membership.
 
-Read the [MemberPress setup guide](https://plandalf.com/docs/product-guides/platforms/memberpress) for requirements, real screenshots, price mapping and buyer verification. The [integration overview](https://plandalf.com/platforms/memberpress) and [launch post](https://plandalf.com/blog/2026-10-04-plandalf-memberpress-wordpress-checkout-plugin) explain the early-access scope and hosted setup status.
+Read the [MemberPress setup guide](https://plandalf.com/docs/product-guides/platforms/memberpress) for requirements, real screenshots, price mapping and buyer verification. The [integration overview](https://plandalf.com/platforms/memberpress) and [launch post](https://plandalf.com/blog/2026-10-04-plandalf-memberpress-wordpress-checkout-plugin) explain what early access covers.
 
 ## Development
 
