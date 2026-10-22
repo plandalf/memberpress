@@ -137,18 +137,6 @@ class Plandalf_Mepr_Api
     }
 
     /** @return array<string, mixed>|WP_Error */
-    public function campaign_binding(string $promo): array|WP_Error
-    {
-        return $this->request('GET', 'promos/'.rawurlencode($promo).'/catalog-binding');
-    }
-
-    /** @return array<string, mixed>|WP_Error */
-    public function save_campaign_binding(int $link_id, string $promo, string $offer): array|WP_Error
-    {
-        return $this->request('POST', 'links/'.$link_id.'/promo-bindings', ['promo' => $promo, 'offer' => $offer]);
-    }
-
-    /** @return array<string, mixed>|WP_Error */
     public function subscription(string $id, bool $include_recovery = false): array|WP_Error
     {
         return $this->request('GET', 'subscriptions/'.rawurlencode($id).($include_recovery ? '?include_recovery=1' : ''));

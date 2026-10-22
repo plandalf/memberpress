@@ -26,7 +26,6 @@ require_once PLANDALF_MEPR_PATH.'includes/class-plandalf-mepr-password-setup.php
 require_once PLANDALF_MEPR_PATH.'includes/class-plandalf-mepr-fulfillment.php';
 require_once PLANDALF_MEPR_PATH.'includes/class-plandalf-mepr-events.php';
 require_once PLANDALF_MEPR_PATH.'includes/class-plandalf-mepr-links.php';
-require_once PLANDALF_MEPR_PATH.'includes/class-plandalf-mepr-campaign.php';
 require_once PLANDALF_MEPR_PATH.'includes/class-plandalf-mepr-connection.php';
 require_once PLANDALF_MEPR_PATH.'includes/class-plandalf-mepr-admin.php';
 require_once PLANDALF_MEPR_PATH.'includes/class-plandalf-mepr-membership-tab.php';
