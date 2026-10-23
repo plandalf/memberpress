@@ -12,6 +12,9 @@ defined('ABSPATH') || exit;
 #[AllowDynamicProperties]
 class MeprPlandalfGateway extends MeprBaseRealGateway
 {
+    /** MemberPress lists a method as "label (name)", so this reads "Checkout (Plandalf)". */
+    public const LABEL = 'Checkout';
+
     private ?array $trial_access = null;
 
     public function __construct()
@@ -43,7 +46,7 @@ class MeprPlandalfGateway extends MeprBaseRealGateway
         $this->settings = (object) array_merge([
             'gateway' => 'MeprPlandalfGateway',
             'id' => $this->generate_id(),
-            'label' => 'Plandalf',
+            'label' => self::LABEL,
             'use_label' => true,
             'icon' => '',
             'use_icon' => false,

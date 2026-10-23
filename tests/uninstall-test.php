@@ -45,3 +45,17 @@ T::add('reinstall: reuses the Plandalf payment method the earlier install left',
     T::same($gateway_id, (string) get_option(Plandalf_Mepr_Plugin::GATEWAY_OPTION));
     T::same($before, count(MeprOptions::fetch()->integrations), 'no second Plandalf payment method');
 });
+
+T::add('gateway: relabels the 0.2.0 "Plandalf (Plandalf)" payment method as "Checkout (Plandalf)"', function () {
+    T::connect();
+    $gateway_id = (string) get_option(Plandalf_Mepr_Plugin::GATEWAY_OPTION);
+    $options = MeprOptions::fetch();
+    $integrations = $options->integrations;
+    $integrations[$gateway_id]['label'] = 'Plandalf';
+    $options->integrations = $integrations;
+    $options->store(false);
+
+    Plandalf_Mepr_Plugin::ensure_gateway();
+
+    T::same('Checkout', MeprOptions::fetch()->integrations[$gateway_id]['label']);
+});

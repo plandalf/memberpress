@@ -66,7 +66,7 @@ class Plandalf_Mepr_Membership_Tab
         wp_nonce_field(self::NONCE, '_plandalf_nonce');
         ?>
         <h3 class="mepr-page-heading"><?php esc_html_e('Plandalf prices that grant this membership', 'plandalf-memberpress'); ?></h3>
-        <p class="description"><?php esc_html_e('Buying any of these prices in Plandalf gives the buyer this membership. Prices and billing schedules are configured in Plandalf; MemberPress controls access. They can differ from the price set here — for example a yearly plan or a launch promo.', 'plandalf-memberpress'); ?></p>
+        <p class="description"><?php esc_html_e('Buying any of these prices in Plandalf gives the buyer this membership. Prices and billing schedules are configured in Plandalf; MemberPress controls access. They can differ from the price set here, for example a yearly plan.', 'plandalf-memberpress'); ?></p>
 
         <?php if (is_wp_error($links)) { ?>
             <p style="color:#b32d2e"><?php echo esc_html($links->get_error_message()); ?></p>

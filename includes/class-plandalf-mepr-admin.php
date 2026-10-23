@@ -182,7 +182,7 @@ class Plandalf_Mepr_Admin
         ?>
         <div class="wrap plandalf-mepr">
             <h1><?php esc_html_e('Plandalf', 'plandalf-memberpress'); ?></h1>
-            <p class="description" style="max-width:760px"><?php esc_html_e('Sell your memberships with Plandalf checkout — offers, upsells, promos and payments — while MemberPress keeps members and access. Three steps:', 'plandalf-memberpress'); ?></p>
+            <p class="description" style="max-width:760px"><?php esc_html_e('Sell your memberships with Plandalf checkout while MemberPress keeps members and access. Three steps:', 'plandalf-memberpress'); ?></p>
             <?php self::render_notices(); ?>
             <style>
                 .plandalf-mepr .pm-step{background:#fff;border:1px solid #dcdcde;border-radius:8px;margin:16px 0;max-width:1040px;padding:4px 24px 20px}
@@ -249,7 +249,7 @@ class Plandalf_Mepr_Admin
         ?>
         <div class="pm-step <?php echo $has_design ? 'pm-done' : ''; ?> <?php echo $connected ? '' : 'pm-muted'; ?>">
             <h2><span class="pm-num"><?php echo $has_design ? '✓' : '2'; ?></span><?php esc_html_e('Choose your checkout design', 'plandalf-memberpress'); ?></h2>
-            <p class="description" style="max-width:760px"><?php esc_html_e('Pick a Plandalf offer to use as the look of your checkout — its pages, blocks and upsells. Every membership page will use it to sell that membership\'s own price. Design it in Plandalf any time; changes show up here automatically.', 'plandalf-memberpress'); ?></p>
+            <p class="description" style="max-width:760px"><?php esc_html_e('Pick a Plandalf offer to use as the look of your checkout. Every membership page will use it to sell that membership\'s own price. Design it in Plandalf any time; changes show up here automatically.', 'plandalf-memberpress'); ?></p>
             <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
                 <?php wp_nonce_field('plandalf_mepr_checkout'); ?>
                 <input type="hidden" name="action" value="plandalf_mepr_checkout" />
@@ -319,7 +319,7 @@ class Plandalf_Mepr_Admin
         ?>
         <div id="memberships" class="pm-step <?php echo $done ? 'pm-done' : ''; ?> <?php echo $ready ? '' : 'pm-muted'; ?>">
             <h2><span class="pm-num"><?php echo $done ? '✓' : '3'; ?></span><?php esc_html_e('Link your memberships to Plandalf prices', 'plandalf-memberpress'); ?></h2>
-            <p class="description" style="max-width:760px"><?php esc_html_e('A membership switches to Plandalf checkout once a Plandalf price grants it. Prices and billing schedules are configured in Plandalf; MemberPress controls access. Create a price from this membership or link an existing yearly plan or promo on its Plandalf tab.', 'plandalf-memberpress'); ?></p>
+            <p class="description" style="max-width:760px"><?php esc_html_e('A membership switches to Plandalf checkout once a Plandalf price grants it. Prices and billing schedules are configured in Plandalf; MemberPress controls access. Create a price from this membership, or link an existing one such as a yearly plan on its Plandalf tab.', 'plandalf-memberpress'); ?></p>
             <?php if (is_wp_error($links)) { ?>
                 <p style="color:#b32d2e"><?php echo esc_html($links->get_error_message()); ?></p>
             <?php } ?>

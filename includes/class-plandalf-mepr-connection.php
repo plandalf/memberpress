@@ -51,7 +51,6 @@ class Plandalf_Mepr_Connection
                 'host_url' => $connection['host_url'], 'domain' => $connection['domain'],
             ],
             'endpoint' => ['id' => (int) $endpoint['id'], 'secret' => $endpoint['secret'], 'url' => $endpoint['url']],
-            'checkout_offer' => '', 'checkout_offer_name' => '',
         ]);
         Plandalf_Mepr_Plugin::ensure_gateway();
 

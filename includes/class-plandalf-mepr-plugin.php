@@ -131,6 +131,13 @@ class Plandalf_Mepr_Plugin
         $gateway_id = (string) get_option(self::GATEWAY_OPTION, '');
 
         if ($gateway_id !== '' && isset($integrations[$gateway_id])) {
+            // 0.2.0 labelled the method "Plandalf", which MemberPress lists as "Plandalf (Plandalf)".
+            if (($integrations[$gateway_id]['label'] ?? '') === 'Plandalf') {
+                $integrations[$gateway_id]['label'] = MeprPlandalfGateway::LABEL;
+                $options->integrations = $integrations;
+                $options->store(false);
+            }
+
             return;
         }
 
@@ -150,7 +157,7 @@ class Plandalf_Mepr_Plugin
         $integrations[$gateway_id] = [
             'gateway' => 'MeprPlandalfGateway',
             'id' => $gateway_id,
-            'label' => 'Plandalf',
+            'label' => MeprPlandalfGateway::LABEL,
             'use_label' => true,
             'use_icon' => false,
             'use_desc' => false,
