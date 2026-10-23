@@ -1,6 +1,6 @@
 # MemberPress OAuth connection
 
-Version 0.2.0 connects to Plandalf's hosted OAuth backend at `https://admin.plandalf.dev`.
+Since 0.2.0 the plugin connects to Plandalf's hosted OAuth backend at `https://admin.plandalf.dev`.
 
 ## Merchant flow
 

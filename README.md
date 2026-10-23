@@ -3,7 +3,7 @@
 Sell MemberPress memberships through Plandalf checkout. The plugin connects to
 Plandalf's public API and receives signed purchase events to grant membership access.
 
-[Download v0.2.0](https://github.com/plandalf/memberpress/releases/tag/v0.2.0) · [Setup guide](https://plandalf.com/docs/product-guides/platforms/memberpress) · [Integration overview](https://plandalf.com/platforms/memberpress)
+[Download v0.2.1](https://github.com/plandalf/memberpress/releases/tag/v0.2.1) · [Setup guide](https://plandalf.com/docs/product-guides/platforms/memberpress) · [Integration overview](https://plandalf.com/platforms/memberpress)
 
 **Early access:** set it up on a staging site first, and replace a live checkout only after your own test purchase and member access check pass.
 
@@ -13,7 +13,7 @@ Plandalf's public API and receives signed purchase events to grant membership ac
 
 ## OAuth connection
 
-Version 0.2.0 uses OAuth authorization code with S256 PKCE. The account selected during consent supplies its checkout host, domain and SDK URL. Manual API-key and host entry have been removed.
+Since 0.2.0 the plugin uses OAuth authorization code with S256 PKCE. The account selected during consent supplies its checkout host, domain and SDK URL. Manual API-key and host entry have been removed.
 
 Access and refresh tokens are encrypted in WordPress using the site's authentication salt and excluded from autoload. Expired tokens refresh at the original issuer. Disconnect revokes the connection and its tokens. Customer identity is signed by Plandalf through the OAuth API; WordPress does not hold its signing key.
 
@@ -87,7 +87,7 @@ JavaScript tests and packaging; it does not install the commercial MemberPress p
 
 ## Release status
 
-Version 0.2.0 is an early-access release. The hosted Plandalf deployment includes site
+Version 0.2.1 is an early-access release. The hosted Plandalf deployment includes site
 connection, catalog links, subscription and webhook APIs. Before replacing a live
 checkout, complete a test purchase, password setup, email delivery and protected-content
 access check on your own staging site.

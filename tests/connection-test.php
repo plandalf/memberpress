@@ -49,6 +49,15 @@ T::add('OAuth: reconnecting cannot silently switch the account or purchase mode'
     T::false((bool) array_filter(T::$requests, fn ($r) => str_contains($r['url'], 'webhook_endpoints')));
 });
 
+T::add('OAuth: reconnecting to the same account keeps the checkout design', function () {
+    T::connect('test');
+    fake_plandalf('test');
+    T::true(Plandalf_Mepr_Connection::connect(oauth_grant(), 'https://plandalf.example'));
+    T::same('design-offer-ABC', Plandalf_Mepr_Settings::get('checkout_offer'));
+    T::same('Site design', Plandalf_Mepr_Settings::get('checkout_offer_name'));
+    T::same(42, Plandalf_Mepr_Settings::get('endpoint')['id']);
+});
+
 T::add('OAuth: exchanges the code at the issuer using PKCE and the exact callback', function () {
     $client = oauth_grant()['client_id'];
     T::route('/oauth/token', function ($args, $body) use ($client) {
